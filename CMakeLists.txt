@@ -52,7 +52,7 @@ add_message_files(
   FILES
   ThrusterRPMs.msg
   BallastAngles.msg
-  FloatStamped.msg
+  PercentStamped.msg
   ThrusterAngles.msg
 )
 

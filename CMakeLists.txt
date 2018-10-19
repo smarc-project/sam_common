@@ -54,6 +54,8 @@ add_message_files(
   BallastAngles.msg
   PercentStamped.msg
   ThrusterAngles.msg
+  Command.msg
+  ArrayCommand.msg
 )
 
 ## Generate services in the 'srv' folder

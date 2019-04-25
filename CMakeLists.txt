@@ -58,6 +58,7 @@ add_message_files(
   ThrusterAngles.msg
   Command.msg
   ArrayCommand.msg
+  Leak.msg
 )
 
 ## Generate services in the 'srv' folder

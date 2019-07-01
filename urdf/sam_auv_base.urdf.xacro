@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+<!-- Copyright (c) 2016 The UUV Simulator Authors.
+     All rights reserved.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+  <!-- Properties -->
+  <xacro:property name="mass" value="30.48"/>
+  <xacro:property name="length" value="1.7"/>
+  <xacro:property name="diameter" value="0.19"/>
+  <xacro:property name="radius" value="${diameter*0.5}"/>
+  <!-- <xacro:property name="volume" value="${length*pi*radius*radius}"/> -->
+  <xacro:property name="volume" value="0.030431864"/>
+  <xacro:property name="cob" value="0 0 0.0196"/>
+  <xacro:property name="rho" value="1025.0"/>
+
+  <xacro:property name="visual_mesh_file" value="file://$(find sam_description)/mesh/sam_body.dae"/>
+  <xacro:property name="prop_mesh_file" value="file://$(find sam_description)/mesh/sam_propeller.dae"/>
+  <xacro:property name="shaft_mesh_file" value="file://$(find sam_description)/mesh/sam_shaft.dae"/>
+  <xacro:property name="propeller_cover_mesh_file" value="file://$(find sam_description)/mesh/sam_cover.dae"/>
+
+  <!-- Macro for the inertial properties of a box -->
+  <xacro:macro name="sam_box_inertial" params="x y z mass *origin">
+    <inertial>
+      <mass value="${mass}" />
+      <xacro:insert_block name="origin" />
+      <inertia ixx="${0.0833333 * mass * (y*y + z*z)}" ixy="0.0" ixz="0.0"
+               iyy="${0.0833333 * mass * (x*x + z*z)}" iyz="0.0"
+               izz="${0.0833333 * mass * (x*x + y*y)}" />
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="sam_auv_base" params="namespace debug">
+    <link name="${namespace}/base_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="${visual_mesh_file}" scale="1 1 1" />
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${0.5*pi} 0"/>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}"/>
+        </geometry>
+      </collision>
+
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.177" ixy="0" ixz="0"
+                 iyy="3.45" iyz="0"
+                 izz="3.45" />
+      </inertial>
+    </link>
+
+	<!-- Shaft -->
+    <joint name="${namespace}/shaft_joint1" type="revolute">
+      <origin xyz="-1.045 0 0" rpy="0 0 0" />
+      <axis xyz="0 0 1"/>
+      <parent link="${namespace}/base_link"/>
+	  <child link="${namespace}/shaft_link_dummy"/>
+	  <limit effort="100" lower="${-0.125*pi}" upper="${0.125*pi}" velocity="10"/>
+	</joint>
+	
+	<link name="${namespace}/shaft_link_dummy">
+      <xacro:sam_box_inertial x="0" y="0" z="0" mass="0.001">
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+      </xacro:sam_box_inertial>
+    </link>
+
+    <joint name="${namespace}/shaft_joint2" type="revolute">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <axis xyz="0 1 0"/>
+      <parent link="${namespace}/shaft_link_dummy"/>
+	  <child link="${namespace}/shaft_link"/>
+	  <limit effort="100" lower="${-0.125*pi}" upper="${0.125*pi}" velocity="10"/>
+    </joint>
+	
+	<link name="${namespace}/shaft_link">
+      <xacro:sam_box_inertial x="0" y="0" z="0" mass="0.001">
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+      </xacro:sam_box_inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="${shaft_mesh_file}" scale="1 1 1"/>
+        </geometry>
+      </visual>
+    </link>
+
+	<!-- Cover -->
+    <joint name="${namespace}/cover_joint" type="revolute">
+      <origin xyz="-0.042 0 0" rpy="${pi} 0 0" />
+      <axis xyz="1 0 0"/>
+      <parent link="${namespace}/shaft_link"/>
+	  <child link="${namespace}/cover_link"/>
+	  <limit effort="0" lower="0" upper="0" velocity="0"/>
+    </joint>
+
+    <link name="${namespace}/cover_link">
+      <xacro:sam_box_inertial x="0" y="0" z="0" mass="0.001">
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+      </xacro:sam_box_inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="${propeller_cover_mesh_file}" scale="1 1 1"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <!-- Propeller 1 -->
+    <joint name="${namespace}/thruster_joint_1" type="continuous">
+      <origin xyz="-0.037 0 0" rpy="0 0 0" />
+      <axis xyz="1 0 0"/>
+      <parent link="${namespace}/shaft_link"/>
+      <child link="${namespace}/thruster_1"/>
+	  <limit effort="0" lower="0" upper="0" velocity="0"/>
+    </joint>
+
+    <!-- Propeller 2 -->
+    <joint name="${namespace}/thruster_joint_2" type="continuous">
+      <origin xyz="-0.058 0 0" rpy="0 0 0" />
+      <axis xyz="1 0 0"/>
+      <parent link="${namespace}/shaft_link"/>
+      <child link="${namespace}/thruster_2"/>
+	  <limit effort="0" lower="0" upper="0" velocity="0"/>
+    </joint>
+	
+	<link name="${namespace}/thruster_1">
+      <xacro:sam_box_inertial x="0" y="0" z="0" mass="0.001">
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+      </xacro:sam_box_inertial>
+      <visual>
+        <origin xyz="0.0 0 0" rpy="0 0 ${pi}" />
+        <geometry>
+          <mesh filename="${prop_mesh_file}" scale="1 1 1"/>
+        </geometry>
+      </visual>
+      <collision> -->
+        <!-- todo: gazebo needs a collision volume or it will ignore the pose of
+           the joint that leads to this link (and assume it to be the identity) -->
+        <geometry>
+          <cylinder length="0.000001" radius="0.000001"/>
+        </geometry>
+        <origin xyz="0.0 0 0" rpy="0 ${0.5*pi} 0"/>
+      </collision>
+    </link>
+
+    <link name="${namespace}/thruster_2">
+      <xacro:sam_box_inertial x="0" y="0" z="0" mass="0.001">
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+      </xacro:sam_box_inertial>
+      <visual>
+        <origin xyz="0.0 0 0" rpy="0 0 ${pi}" />
+        <geometry>
+          <mesh filename="${prop_mesh_file}" scale="1 1 1"/>
+        </geometry>
+      </visual>
+      <collision> -->
+        <!-- todo: gazebo needs a collision volume or it will ignore the pose of
+           the joint that leads to this link (and assume it to be the identity) -->
+        <geometry>
+          <cylinder length="0.000001" radius="0.000001"/>
+        </geometry>
+        <origin xyz="0.0 0 0" rpy="0 ${0.5*pi} 0"/>
+      </collision>
+    </link>
+
+    <!-- Mount a 3D pose sensor -->
+    <link name="${namespace}/pose_sensor_link">
+      <xacro:sam_box_inertial x="0" y="0" z="0" mass="0.001">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </xacro:sam_box_inertial>
+      <visual>
+        <geometry>
+          <box size="0.01 0.01 0.01" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="${namespace}/pose_sensor_joint" type="revolute">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${namespace}/base_link"/>
+      <child link="${namespace}/pose_sensor_link"/>
+      <limit upper="0" lower="0" effort="0" velocity="0" />
+    </joint>
+
+  </xacro:macro>
+</robot>

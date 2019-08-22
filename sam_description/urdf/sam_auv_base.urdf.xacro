@@ -22,7 +22,7 @@
   <xacro:property name="diameter" value="0.125"/>
   <xacro:property name="radius" value="${diameter*0.5}"/>
   <xacro:property name="cylinder_length" value="1.094"/>
-  <xacro:property name="base_link_shift" value="${0.627 - cylinder_length}"/>
+  <xacro:property name="base_link_shift" value="${0.737 - cylinder_length}"/>
   <!-- <xacro:property name="volume" value="${length*pi*radius*radius}"/> -->
   <xacro:property name="volume" value="0.014"/>
   <xacro:property name="cob" value="0 0 0.03"/>
@@ -206,7 +206,9 @@
       <limit upper="0" lower="0" effort="0" velocity="0" />
     </joint>
 
+    <!-- Sensors  -->
     <xacro:unless value="${simulation}">
+    
       <!--IMU -->
       <link name="${namespace}/imu_link">
         <inertial>
@@ -230,9 +232,145 @@
       </link>
       
       <joint name="${namespace}/imu_joint" type="fixed">
-        <origin xyz="0.0 0 -0.03" rpy="0 -${M_PI/2} 0" />
+        <origin xyz="0.273 0 -0.03" rpy="0 -${M_PI/2} 0" />
         <parent link="${namespace}/base_link"/>
         <child link="${namespace}/imu_link"/>
+      </joint>
+
+      <!-- DVL: three heads + main sensor frame -->
+      <link name="${namespace}/dvl_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="blue"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/dvl_joint" type="fixed">
+        <origin xyz="0.530 0 -0.03" rpy="0 0 0" />
+        <parent link="${namespace}/base_link"/>
+        <child link="${namespace}/dvl_link"/>
+      </joint>
+
+      <link name="${namespace}/dvl_port_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="blue"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/dvl_port_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0 1.22173 0.785398" />
+        <parent link="${namespace}/dvl_link"/>
+        <child link="${namespace}/dvl_port_link"/>
+      </joint>
+
+      <link name="${namespace}/dvl_down_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="blue"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/dvl_down_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0 ${M_PI/2} 0" />
+        <parent link="${namespace}/dvl_link"/>
+        <child link="${namespace}/dvl_down_link"/>
+      </joint>
+
+       <link name="${namespace}/dvl_starboard_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="blue"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/dvl_starboard_joint" type="fixed">
+        <origin xyz="0. 0.0 0.0" rpy="0 1.22173 -0.785398" />
+        <parent link="${namespace}/dvl_link"/>
+        <child link="${namespace}/dvl_starboard_link"/>
+      </joint>
+
+      <link name="${namespace}/pressure_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="blue"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/pressure_joint" type="fixed">
+        <origin xyz="-0.562 0.0 -0.03 " rpy="0 0 0" />
+        <parent link="${namespace}/base_link"/>
+        <child link="${namespace}/pressure_link"/>
       </joint>
 
     </xacro:unless>

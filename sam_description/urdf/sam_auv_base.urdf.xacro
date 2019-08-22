@@ -34,6 +34,7 @@
   <xacro:property name="shaft_mesh_file" value="file://$(find sam_description)/mesh/sam_shaft.dae"/>
   <xacro:property name="propeller_cover_mesh_file" value="file://$(find sam_description)/mesh/sam_cover.dae"/>
 
+  <xacro:property name="simulation" default="false"/>
   <xacro:property name="M_PI" value="3.1415926535897931" />
 
   <!-- Macro for the inertial properties of a box -->
@@ -205,7 +206,7 @@
       <limit upper="0" lower="0" effort="0" velocity="0" />
     </joint>
 
-    <!-- <xacro:if value="${simulation == 'false'}"/> -->
+    <xacro:unless value="${simulation}">
       <!--IMU -->
       <link name="${namespace}/imu_link">
         <inertial>
@@ -229,14 +230,12 @@
       </link>
       
       <joint name="${namespace}/imu_joint" type="fixed">
-        <origin xyz="0.0 0 -0.03" rpy="0 ${M_PI/2} 0" />
+        <origin xyz="0.0 0 -0.03" rpy="0 -${M_PI/2} 0" />
         <parent link="${namespace}/base_link"/>
         <child link="${namespace}/imu_link"/>
       </joint>
-      
-    <!-- </xacro:if> -->
 
-
+    </xacro:unless>
 
   </xacro:macro>
 </robot>

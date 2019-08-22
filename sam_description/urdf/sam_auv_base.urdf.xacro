@@ -17,6 +17,8 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
   <!-- Properties -->
+  <xacro:property name="simulation" default="false"/>
+
   <xacro:property name="mass" value="30.48"/>
   <xacro:property name="length" value="1.7"/>
   <xacro:property name="diameter" value="0.19"/>
@@ -30,6 +32,8 @@
   <xacro:property name="prop_mesh_file" value="file://$(find sam_description)/mesh/sam_propeller.dae"/>
   <xacro:property name="shaft_mesh_file" value="file://$(find sam_description)/mesh/sam_shaft.dae"/>
   <xacro:property name="propeller_cover_mesh_file" value="file://$(find sam_description)/mesh/sam_cover.dae"/>
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
 
   <!-- Macro for the inertial properties of a box -->
   <xacro:macro name="sam_box_inertial" params="x y z mass *origin">
@@ -199,6 +203,39 @@
       <child link="${namespace}/pose_sensor_link"/>
       <limit upper="0" lower="0" effort="0" velocity="0" />
     </joint>
+
+    <!-- <xacro:if value="${simulation == 'false'}"/> -->
+      <!--IMU -->
+      <link name="${namespace}/imu_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="red"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/imu_joint" type="fixed">
+        <origin xyz="0.0 0 -0.03" rpy="0 ${M_PI/2} 0" />
+        <parent link="${namespace}/base_link"/>
+        <child link="${namespace}/imu_link"/>
+      </joint>
+      
+    <!-- </xacro:if> -->
+
+
 
   </xacro:macro>
 </robot>

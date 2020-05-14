@@ -22,7 +22,7 @@
   <xacro:property name="diameter" value="0.125"/>
   <xacro:property name="radius" value="${diameter*0.5}"/>
   <xacro:property name="cylinder_length" value="1.094"/>
-  <xacro:property name="base_link_shift" value="${0.737 - cylinder_length}"/>
+  <xacro:property name="base_link_shift" value="${0.734 - cylinder_length}"/>
   <!-- <xacro:property name="volume" value="${length*pi*radius*radius}"/> -->
   <xacro:property name="volume" value="0.014"/>
   <xacro:property name="cob" value="0 0 0.03"/>
@@ -208,8 +208,65 @@
 
     <!-- Sensors  -->
     <xacro:unless value="${simulation}">
+      
+      <!--GPS -->
+      <link name="${namespace}/gps_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="red"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/gps_joint" type="fixed">
+        <origin xyz="0.502 0 0.0" rpy="0 0 0" />
+        <parent link="${namespace}/base_link"/>
+        <child link="${namespace}/gps_link"/>
+      </joint>
+
+      <!--SBG IMU -->
+      <link name="${namespace}/sbg_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="red"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/sbg_joint" type="fixed">
+        <origin xyz="0.472 0 0.03" rpy="0 0 0" />
+        <parent link="${namespace}/base_link"/>
+        <child link="${namespace}/sbg_link"/>
+      </joint>
+
     
-      <!--IMU -->
+      <!--STIM IMU -->
       <link name="${namespace}/imu_link">
         <inertial>
           <mass value="0.001"/>
@@ -232,7 +289,7 @@
       </link>
       
       <joint name="${namespace}/imu_joint" type="fixed">
-        <origin xyz="0.273 0 -0.03" rpy="0 0 0" />
+        <origin xyz="0.192 0 -0.03" rpy="0 0 0" />
         <parent link="${namespace}/base_link"/>
         <child link="${namespace}/imu_link"/>
       </joint>

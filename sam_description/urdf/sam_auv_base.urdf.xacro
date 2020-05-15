@@ -260,7 +260,7 @@
       </link>
       
       <joint name="${namespace}/sbg_joint" type="fixed">
-        <origin xyz="0.472 0 0.03" rpy="0 0 -${M_PI/2}" />
+        <origin xyz="0.472 0 0.03" rpy="0 0 0" />
         <parent link="${namespace}/base_link"/>
         <child link="${namespace}/sbg_link"/>
       </joint>

@@ -33,6 +33,12 @@
   <link name="$(arg robot_namespace)/imu_link">
   </link>
 
+  <link name="$(arg robot_namespace)/sbg_link">
+  </link>
+  
+<!--   <link name="$(arg robot_namespace)/mag_link">
+  </link> -->
+  
   <link name="$(arg robot_namespace)/gps_link">
   </link>
 
@@ -68,6 +74,19 @@
     <child link="$(arg robot_namespace)/imu_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.9 0.0 0.0"/>
   </joint>
+
+  <joint name="$(arg robot_namespace)/sbg_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/sbg_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.472 0 0.03"/>
+  </joint>
+
+    <!-- Compass doesn't seem to have a ROS parser -->
+<!--   <joint name="$(arg robot_namespace)/mag_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/mag_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.472 0 0.03"/>
+  </joint> -->
 
   <joint name="$(arg robot_namespace)/gps_joint" type="fixed">
     <parent link="$(arg robot_namespace)/base_link"/>

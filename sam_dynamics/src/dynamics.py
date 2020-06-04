@@ -10,7 +10,7 @@ class Dynamics:
     def eom(self, state, control):
         raise NotImplementedError
 
-    def eom_jac(self, state, controls):
+    def eom_jac(self, state, control):
         raise NotImplementedError
 
     def propagate(self, state, controller, t0, tf, atol=1e-8, rtol=1e-8, method='DOP853'):

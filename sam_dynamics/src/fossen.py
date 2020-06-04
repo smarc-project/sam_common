@@ -584,7 +584,7 @@ class Fossen(Dynamics):
             [0, 0, 0, x120*x356 + x130*x358 + x140*x359 - x150*x354 + x338*x360 + x357*x83, x163*x357 + x166*x356 + x169*x358 + x170*x359 + x171*x361 - x172*x354, x189*x357 + x192*x356 + x195*x358 + x198*x361 - x200*x354 + x205*x359, x216*x357 + x218*x356 + x221*x358 + x222*x361 - x223*x354 + x224*x359,     q*x362 + x230*x361 - x233*x354 + x236*x359 + x238*x358 - x357*x363,    -p*x362 + x243*x361 - x245*x354 + x248*x359 + x249*x357 + x358*x363,  x250*x361 - x255*x354 + x258*x359 + x259*x356 - x345*x358 + x346*x357,  x262*x361 - x265*x354 + x268*x359 + x269*x357 + x270*x356 + x273*x358,  x275*x361 - x278*x354 + x279*x359 + x281*x357 + x282*x356 + x283*x358,  x284*x361 - x285*x354 + x286*x359 + x287*x357 + x288*x356 + x289*x358]
         ], dtype=np.float32)
 
-    def plot(self, fname, states, controls=None):
+    def plot(self, fname, states, controls=None, dpi=500):
 
         # create figure
         fig = plt.figure()
@@ -596,7 +596,7 @@ class Fossen(Dynamics):
         # labels
         ax.set_xlabel('$x$ [m]')
         ax.set_ylabel('$y$ [m]')
-        ax.set_ylabel('$z$ [m]')
+        ax.set_zlabel('$z$ [m]')
         
         # formating
         ax.grid('False')
@@ -608,7 +608,7 @@ class Fossen(Dynamics):
         ax.w_zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
 
         # save
-        fig.savefig(fname, bbox_inches='tight')
+        fig.savefig(fname, bbox_inches='tight', dpi=500)
         plt.show()
 
 
@@ -627,4 +627,4 @@ if __name__ == '__main__':
     t, x, u = system.propagate(state, controller, 0, 50, atol=1e-4, rtol=1e-4)
 
     # save
-    system.plot('trajectory.pdf', x)
+    system.plot('../img/trajectory.png', x, dpi=500)

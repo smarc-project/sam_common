@@ -294,6 +294,35 @@
         <child link="${namespace}/imu_link"/>
       </joint>
 
+      <!-- Cameras: three cams + main sensor frame -->
+      <!-- TODO: add missing ones -->
+      <link name="${namespace}/camera_down_link">
+        <inertial>
+          <mass value="0.001"/>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+          <material name="blue"/>  
+        </visual>
+        <collision>
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <geometry>
+            <box size="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${namespace}/camera_down_joint" type="fixed">
+        <origin xyz="0.530 0 -0.03" rpy="0 ${M_PI/2} 0" />
+        <parent link="${namespace}/base_link"/>
+        <child link="${namespace}/camera_down_link"/>
+      </joint>
+
       <!-- DVL: three heads + main sensor frame -->
       <link name="${namespace}/dvl_link">
         <inertial>

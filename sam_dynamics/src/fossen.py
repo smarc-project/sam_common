@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from mpl_toolkits.mplot3d import Axes3D
 from dynamics import Dynamics
+from collections import OrderedDict
 
 class Fossen(Dynamics):
 
@@ -14,17 +15,26 @@ class Fossen(Dynamics):
     state_dim = 13
     control_dim = 4
 
-    def __init__(self, Nrr=150., Izz=10., Kt1=0.1, zb=0., Mqq=100., ycp=0., xb=0., zcp=0., Yvv=100., yg=0., Ixx=10., Kt0=0.1, Xuu=1., xg=0., Zww=100., W=15.4*9.81, m=15.4, B=15.4*9.81, zg=0., Kpp=100., Qt1=-0.001, Qt0=0.001, Iyy=10., yb=0., xcp=0.1):
+    # default parameters
+    params = OrderedDict(
+        Nrr=150., Izz=10., Kt1=0.1, zb=0., Mqq=100., 
+        ycp=0., xb=0., zcp=0., Yvv=100., yg=0., Ixx=10., 
+        Kt0=0.1, Xuu=1., xg=0., Zww=100., W=15.4*9.81, 
+        m=15.4, B=15.4*9.81, zg=0., Kpp=100., Qt1=-0.001, 
+        Qt0=0.001, Iyy=10., yb=0., xcp=0.1
+    )
+
+    def __init__(self, **kwargs):
 
         # become dynamics model
-        Dynamics.__init__(self)
-
-        # constant parameters
-        self.Nrr, self.Izz, self.Kt1, self.zb, self.Mqq, self.ycp, self.xb, self.zcp, self.Yvv, self.yg, self.Ixx, self.Kt0, self.Xuu, self.xg, self.Zww, self.W, self.m, self.B, self.zg, self.Kpp, self.Qt1, self.Qt0, self.Iyy, self.yb, self.xcp = Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp
+        Dynamics.__init__(self, **kwargs)
 
     @staticmethod
     @jit
-    def _eom(state, control, Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp):
+    def eom(state, control, *params):
+
+        # constant parameters
+        Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp = params
 
         # sanity
         assert len(state.shape) == len(control.shape) == 1
@@ -208,9 +218,10 @@ class Fossen(Dynamics):
             x104*x97 + x114*x36*x95 + x118*x122 - x126*x94 + x52*x74 + x80*x90
         ], dtype=np.float32)
 
-    @staticmethod
-    @jit
-    def _eom_jac_sympy(state, control, Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp):
+    def eom_jac_sympy(state, control, *params):
+
+        # constant parameters
+        Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp = params
 
         # sanity
         assert len(state.shape) == len(control.shape) == 1
@@ -604,20 +615,6 @@ class Fossen(Dynamics):
             [0, 0, 0, x120*x356 + x130*x358 + x140*x359 - x150*x354 + x338*x360 + x357*x83, x163*x357 + x166*x356 + x169*x358 + x170*x359 + x171*x361 - x172*x354, x189*x357 + x192*x356 + x195*x358 + x198*x361 - x200*x354 + x205*x359, x216*x357 + x218*x356 + x221*x358 + x222*x361 - x223*x354 + x224*x359,     q*x362 + x230*x361 - x233*x354 + x236*x359 + x238*x358 - x357*x363,    -p*x362 + x243*x361 - x245*x354 + x248*x359 + x249*x357 + x358*x363,  x250*x361 - x255*x354 + x258*x359 + x259*x356 - x345*x358 + x346*x357,  x262*x361 - x265*x354 + x268*x359 + x269*x357 + x270*x356 + x273*x358,  x275*x361 - x278*x354 + x279*x359 + x281*x357 + x282*x356 + x283*x358,  x284*x361 - x285*x354 + x286*x359 + x287*x357 + x288*x356 + x289*x358]
         ], dtype=np.float32)
 
-    @staticmethod
-    @jit
-    def _eom_jac(state, control, Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp):
-        return jacfwd(Fossen._eom)(state, control, Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp)
-
-    def eom(self, state, control):
-        return self._eom(state, control, self.Nrr, self.Izz, self.Kt1, self.zb, self.Mqq, self.ycp, self.xb, self.zcp, self.Yvv, self.yg, self.Ixx, self.Kt0, self.Xuu, self.xg, self.Zww, self.W, self.m, self.B, self.zg, self.Kpp, self.Qt1, self.Qt0, self.Iyy, self.yb, self.xcp)
-
-    def eom_jac_sympy(self, state, control):
-        return self._eom_jac_sympy(state, control, self.Nrr, self.Izz, self.Kt1, self.zb, self.Mqq, self.ycp, self.xb, self.zcp, self.Yvv, self.yg, self.Ixx, self.Kt0, self.Xuu, self.xg, self.Zww, self.W, self.m, self.B, self.zg, self.Kpp, self.Qt1, self.Qt0, self.Iyy, self.yb, self.xcp)
-
-    def eom_jac(self, state, control):
-        return self._eom_jac(state, control, self.Nrr, self.Izz, self.Kt1, self.zb, self.Mqq, self.ycp, self.xb, self.zcp, self.Yvv, self.yg, self.Ixx, self.Kt0, self.Xuu, self.xg, self.Zww, self.W, self.m, self.B, self.zg, self.Kpp, self.Qt1, self.Qt0, self.Iyy, self.yb, self.xcp)
-
     def plot(self, fname, states, controls=None, dpi=500):
 
         # create figure
@@ -657,7 +654,7 @@ if __name__ == '__main__':
     # define a controller
     controller = lambda x: np.array([1000, 1000, 0.1, 0.1], dtype=np.float32)
 
-    # propagate system
+    # # propagate system
     t, x, u = system.propagate(state, controller, 0, 50, atol=1e-4, rtol=1e-4)
 
     # save

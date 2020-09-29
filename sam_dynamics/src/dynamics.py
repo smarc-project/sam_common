@@ -2,28 +2,36 @@
 # Use, e.g., for optimal control, MPC, etc.
 # Christopher Iliffe Sprague
 
+import jax.numpy as np
+from jax import jit, jacfwd
 import numpy as np, matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 class Dynamics:
 
-    def eom(self, state, control):
-        raise NotImplementedError
+    def __init__(self, **kwargs):
 
-    def eom_jac(self, state, control):
+        # constant parameters
+        assert all(key in self.params.keys() for key in kwargs.keys())
+        self.params.update(kwargs)
+
+        # compute and compile Jacobian
+        self.eom_jac = jit(jacfwd(self.eom))
+
+    def eom(self, state, control, *args):
         raise NotImplementedError
 
     def propagate(self, state, controller, t0, tf, atol=1e-8, rtol=1e-8, method='DOP853'):
 
         # integrate dynamics
         sol = solve_ivp(
-            lambda t, x: self.eom(x, controller(x)),
+            jit(lambda t, x: self.eom(x, controller(x), *self.params.values())),
             (t0, tf),
             state,
             method=method,
             rtol=rtol,
             atol=atol,
-            jac=lambda t, x: self.eom_jac(x, controller(x))
+            jac=jit(lambda t, x: self.eom_jac(x, controller(x), *self.params.values()))
         )
 
         # return times, states, and controls

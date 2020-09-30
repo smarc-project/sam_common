@@ -15,6 +15,19 @@ class Fossen(Dynamics):
     state_dim = 13
     control_dim = 4
 
+    # state bounds and scaling
+    state_lb = np.array([
+        *[-2000]*3, # position
+        *[-1]*4,      # quaternions
+        *[-10]*3,     # velocity
+        *[-10]*3      # ang. velocity
+    ])
+    state_ub = -state_lb
+
+    # control bounds
+    control_lb = np.array([*[-200]*2, *[-0.15]*2])
+    control_ub = np.array([*[1500]*2, *[0.15]*2])
+
     # default parameters
     params = OrderedDict(
         Nrr=150., Izz=10., Kt1=0.1, zb=0., Mqq=100., 
@@ -31,19 +44,46 @@ class Fossen(Dynamics):
 
     @staticmethod
     @jit
-    def eom(state, control, *params):
-
-        # constant parameters
-        Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp = params
+    def lagrangian(state, control, homotopy, *params):
 
         # sanity
         assert len(state.shape) == len(control.shape) == 1
         assert state.shape[-1] == Fossen.state_dim
         assert control.shape[-1] == Fossen.control_dim
 
+        # constant parameters
+        Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp = params
+
+        # extract state and control
+        x, y, z, et0, eps1, eps2, eps3, u, v, w, p, q, r = state
+        rpm0, rpm1, de, dr = control/(Fossen.control_ub - Fossen.control_lb)
+
+        # homotopic cost: (quadratic-effort)-time
+        a, b = homotopy
+        J = sum([
+            (1-b)*(
+                (1-a)*u**2 + a*np.abs(u)
+            )
+            + a
+        for u in [rpm0, rpm1]])
+        return J
+
+    @staticmethod
+    @jit
+    def state_dynamics(state, control, *params):
+
+        # sanity
+        assert len(state.shape) == len(control.shape) == 1
+        assert state.shape[-1] == Fossen.state_dim
+        assert control.shape[-1] == Fossen.control_dim
+
+        # constant parameters
+        Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp = params
+
         # extract state and control
         x, y, z, et0, eps1, eps2, eps3, u, v, w, p, q, r = state
         rpm0, rpm1, de, dr = control
+        # rpm0, rpm1, de, dr = control*(Fossen.control_ub - Fossen.control_lb) - Fossen.control_lb
 
         # common subexpression elimination
         x0 = 2*eps2
@@ -218,7 +258,9 @@ class Fossen(Dynamics):
             x104*x97 + x114*x36*x95 + x118*x122 - x126*x94 + x52*x74 + x80*x90
         ], dtype=np.float32)
 
-    def eom_jac_sympy(state, control, *params):
+    @staticmethod
+    @jit
+    def state_dynamics_jac_state_sympy(state, control, *params):
 
         # constant parameters
         Nrr, Izz, Kt1, zb, Mqq, ycp, xb, zcp, Yvv, yg, Ixx, Kt0, Xuu, xg, Zww, W, m, B, zg, Kpp, Qt1, Qt0, Iyy, yb, xcp = params
@@ -231,6 +273,7 @@ class Fossen(Dynamics):
         # extract state and control
         x, y, z, et0, eps1, eps2, eps3, u, v, w, p, q, r = state
         rpm0, rpm1, de, dr = control
+        # rpm0, rpm1, de, dr = control*(Fossen.control_ub - Fossen.control_lb) - Fossen.control_lb
 
         # common subexpression elimination
         x0 = 2*w
@@ -622,7 +665,7 @@ class Fossen(Dynamics):
         ax = fig.add_subplot(111, projection='3d')
         
         # plot positional trajectory
-        ax.plot(x[:,0], x[:,1], x[:,2], 'k.-')
+        ax.plot(states[:,0], states[:,1], states[:,2], 'k.-')
 
         # labels
         ax.set_xlabel('$x$ [m]')
@@ -650,9 +693,9 @@ if __name__ == '__main__':
 
     # initial state
     state = np.array([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float32)
-
-    # define a controller
-    controller = lambda x: np.array([1000, 1000, 0.1, 0.1], dtype=np.float32)
+    
+    # controller
+    controller = lambda x: np.array([1000, 1000, 0.1, 0.1])
 
     # # propagate system
     t, x, u = system.propagate(state, controller, 0, 50, atol=1e-4, rtol=1e-4)

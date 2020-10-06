@@ -43,133 +43,144 @@ class Dynamics:
         return -jacfwd(self.hamiltonian)(state, costate, control, homotopy, *params)
 
     @partial(jit, static_argnums=(0,))
+    def collocate_lagrangian(self, states, controls, times, costs, homotopy, *params):
+
+        # sanity
+        assert len(states.shape) == len(controls.shape) == 2
+        assert len(times.shape) == len(costs.shape) == 1
+        assert states.shape[0] == controls.shape[0] == times.shape[0] == costs.shape[0]
+
+        # https://en.wikipedia.org/wiki/Trapezoidal_rule
+        f = vmap(lambda state, control: self.lagrangian(state, control, homotopy, *params))
+        fa = f(states[:-1,:], controls[:-1,:])
+        fb = f(states[1:,:], controls[1:,:])
+        dt = times[1:] - times[:-1]
+        e = costs[:-1] + dt*(fa + fb)/2.0 - costs[1:]
+        return e
+
+    @partial(jit, static_argnums=(0,))
     def collocate_state(self, states, controls, times, *params):
 
         # sanity
-        assert len(states.shape) == len(controls.shape)
+        assert len(states.shape) == len(controls.shape) == 2
         assert len(times.shape) == 1
         assert states.shape[0] == controls.shape[0] == times.shape[0]
 
-        # state collocation — https://en.wikipedia.org/wiki/Trapezoidal_rule
+        # https://en.wikipedia.org/wiki/Trapezoidal_rule
         f = vmap(lambda state, control: self.state_dynamics(state, control, *params))
-        fa = f(states[1:,:], controls[1:,:])
-        fb = f(states[:-1,:], controls[:-1,:])
+        fa = f(states[:-1,:], controls[:-1,:])
+        fb = f(states[1:,:], controls[1:,:])
         dt = times[1:] - times[:-1]
         e = states[:-1,:] + dt.dot(fa + fb)/2.0 - states[1:,:]
         return e
 
-    @partial(jit, static_argnums=(0,))
-    def collocate_costate(self, states, costates, controls, times, homotopy, *params):
+    def solve_direct(self, states, controls, T, homotopy, boundaries):
 
         # sanity
-        assert len(states.shape) == len(costates.shape) == len(controls.shape)
-        assert len(times.shape) == 1
-        assert states.shape[0] == states.shape[0] == costates.shape[0] == controls.shape[0] == times.shape[0]
-
-        # costate_collocation
-        f = vmap(lambda state, costate, control: self.costate_dynamics(state, costate, control, homotopy, *params))
-        fa = f(states[1:,:], costates[1:,:], controls[1:,:])
-        fb = f(states[:-1,:], costates[:-1,:], controls[:-1,:])
-        dt = times[1:] - times[:-1]
-        e = costates[:-1,:] + dt.dot(fa + fb)/2.0 - costates[1:,:]
-        return e
-
-    def solve_indirect(self, states, costates, controls, T, homotopy, boundaries):
-        # z = [T, s0, l0, u0, ..., sn, ln, un]
+        assert states.shape[0] == controls.shape[0]
+        assert states.shape[1] == self.state_dim
+        assert controls.shape[1] == self.control_dim
 
         # system parameters
         params = self.params.values()
 
         # number of collocation nodes
         n = states.shape[0]
-
-        # compile decision vector bounds
+        
+        # decision vector bounds
+        @jit
         def get_bounds():
-            zl = np.hstack((self.state_lb, -100*np.ones_like(self.state_lb), self.control_lb))
+            zl = np.hstack((self.state_lb, self.control_lb))
             zl = np.tile(zl, n)
             zl = np.hstack(([0.0], zl))
-            zu = np.hstack((self.state_ub, 100*np.ones_like(self.state_ub), self.control_ub))
+            zu = np.hstack((self.state_ub, self.control_ub))
             zu = np.tile(zu, n)
-            zu = np.hstack(([T], zu))
+            zu = np.hstack(([np.inf], zu))
             return zl, zu
-        self.get_bounds = jit(get_bounds)
 
-        zl, zu = self.get_bounds()
-        zr = uniform(PRNGKey(0), (zl.shape[0],), minval=zl, maxval=zu)
+        # decision vector maker
+        @jit
+        def flatten(states, controls, T):
+            z = np.hstack((states, controls)).flatten()
+            z = np.hstack(([T], z))
+            return z
 
-        # compile decision vector translator
+        # decsision vector translator
         @jit
         def unflatten(z):
             T = z[0]
-            z = z[1:]
-            z = z.reshape(-1, self.state_dim*2 + self.control_dim)
+            z = z[1:].reshape(n, self.state_dim + self.control_dim)
             states = z[:,:self.state_dim]
-            costates = z[:,self.state_dim:self.state_dim*2]
-            controls = z[:,self.state_dim*2:self.state_dim*2+self.control_dim]
-            return states, costates, controls, T
+            controls = z[:,self.state_dim:]
+            return states, controls, T
 
-        # gradient of Hamiltonian wrt control = 0
-        @vmap
+        # fitness vector
+        print('Compiling fitness...')
         @jit
-        def hamiltonian_jac_control(state, costate, control):
-            return jacfwd(self.hamiltonian, argnums=2)(state, costate, control, homotopy, *params)
-
-        # compile fitness vector
-        print('Compiling fitness vector...')
         def fitness(z):
 
             # translate decision vector
-            states, costates, controls, T = unflatten(z)
+            states, controls, T = unflatten(z)
 
             # time grid
             n = states.shape[0]
             times = np.linspace(0, T, n)
 
-            # collocation constraints
-            e0 = self.collocate_state(states, controls, times, *params).flatten()
-            e1 = self.collocate_costate(states, costates, controls, times, homotopy, *params).flatten()
-            e = np.hstack((e0, e1))
+            # objective
+            L = vmap(lambda state, control: self.lagrangian(state, control, homotopy, *params))
+            L = L(states, controls)
+            J = np.trapz(L, dx=T/(n-1))
 
-            # boundary constraints
-            e1, e2 = boundaries(states[0,:], costates[0,:], states[-1,:], costates[-1,:])
-            e = np.hstack((e, e1, e2))
+            # Lagrangian state dynamics constraints, and boundary constraints
+            # e0 = self.collocate_lagrangian(states, controls, times, costs, homotopy, *params)
+            e1 = self.collocate_state(states, controls, times, *params)
+            e2, e3 = boundaries(states[0,:], states[-1,:])
+            e = np.hstack((e1.flatten(), e2, e3))**2
 
-            # Jacobian of Hamiltonian wrt control = 0
-            e0 = hamiltonian_jac_control(states, costates, controls)
-            e = np.hstack((e, e0.flatten()))**2
-            
-            # fitness vector — only constraints
-            return np.hstack(([1], e))
+            # fitness vector
+            return np.hstack((J, e))
 
-        self.fitness = jit(fitness)
+        # z = flatten(states, controls, T)
+        # fitness(z)
 
-        # compile sparse Jacobian
-        print('Compiling Jacobian...')
-        gradient = jit(jacfwd(self.fitness))
-        gid = np.vstack((np.nonzero(gradient(zr)))).T
-        self.gradient = jit(lambda z: gradient(z)[[*gid.T]])
-        self.gradient_sparsity = jit(lambda : gid)
+        # sparse Jacobian
+        print('Compiling Jacobian and its sparsity...')
+        gradient = jit(jacfwd(fitness))
+        z = flatten(states, controls, T)
+        sparse_id = np.vstack((np.nonzero(gradient(z)))).T
+        sparse_gradient = jit(lambda z: gradient(z)[[*sparse_id.T]])
+        gradient_sparsity = jit(lambda : sparse_id)
+        print('Jacobian has {} elements.'.format(sparse_id.shape[0]))
 
-        # fitness dimensions
+        # assign PyGMO problem methods
+        self.fitness = fitness
+        self.gradient = sparse_gradient
+        self.gradient_sparsity = gradient_sparsity
+        self.get_bounds = get_bounds
         self.get_nobj = jit(lambda: 1)
-        nec = len(self.fitness(zr)) - 1
+        nec = fitness(z).shape[0] - 1
         self.get_nec = jit(lambda: nec)
 
-        # pygmo problem
-        print('Optimising...')
+        # plot before
+        states, controls, T = unflatten(z)
+        self.plot('../img/direct_before.png', states, dpi=1000)
+
+        # solve NLP with IPOPT
+        print('Solving...')
         prob = pg.problem(udp=self)
         algo = pg.ipopt()
-        algo.set_integer_option('max_iter', 2000)
+        algo.set_integer_option('max_iter', 1000)
         algo = pg.algorithm(algo)
         algo.set_verbosity(1)
-        pop = pg.population(prob=prob, size=1)
+        pop = pg.population(prob=prob, size=0)
+        pop.push_back(z)
         pop = algo.evolve(pop)
+
+        # save and plot solution
         z = pop.champion_x
         np.save('decision.npy', z)
-
-        states, costates, control, T = unflatten(z)
-        self.plot('../img/pontryagin.png', states, dpi=5000)
-
+        states, controls, T = unflatten(z)
+        self.plot('../img/direct_after.png', states, dpi=1000)
 
     def plot(self, states, controls=None):
         raise NotImplementedError
@@ -201,23 +212,23 @@ if __name__ == '__main__':
     params = system.params.values()
 
     # random states and controls
-    n = 20
+    n = 50
     k = PRNGKey(0)
     states = uniform(k, (n, system.state_dim), minval=system.state_lb, maxval=system.state_ub)
     costates = normal(k, (n, system.state_dim))
     controls = uniform(k, (n, system.control_dim), minval=system.control_lb, maxval=system.control_ub)
+    costs = np.linspace(0, 100, n)
     times = np.linspace(0.0, 100.0, num=n)
-    homotopy = [0.0, 0.0]
-    T = 10.0
+    homotopy = [0.5, 0.0]
+    T = 20.0
 
     # boundary constraints
     @jit
-    def boundaries(state0, costate0, statef, costatef):
+    def boundaries(state0, statef):
         e0 = np.array([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float32)
         e0 -= state0 
-        e1 = np.array([100, 100, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float32)
+        e1 = np.array([10, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float32)
         e1 -= statef
         return e0, e1
 
-    res = system.solve_indirect(states, costates, controls, T, homotopy, boundaries)
-    print(res)
+    system.solve_direct(states, controls, T, homotopy, boundaries)

@@ -681,6 +681,9 @@ class Fossen(Dynamics):
         ax.w_yaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
         ax.w_zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
 
+        # ax.set_aspect('equal')
+        ax.auto_scale_xyz([-10, 10], [-10, 10], [-10, 10])
+
         # save
         fig.savefig(fname, bbox_inches='tight', dpi=500)
         plt.show()

@@ -60,6 +60,7 @@ add_message_files(
   ArrayCommand.msg
   Leak.msg
   ConsumedChargeFeedback.msg
+  CTP.msg
 )
 
 ## Generate services in the 'srv' folder

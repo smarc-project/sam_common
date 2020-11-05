@@ -59,12 +59,16 @@ add_message_files(
   Command.msg
   ArrayCommand.msg
   Leak.msg
+  ConsumedCharge.msg
+  ConsumedChargeArray.msg
   ConsumedChargeFeedback.msg
   CTP.msg
   UavcanNodeStatus.msg
   UavcanNodeStatusNamed.msg
   UavcanNodeStatusNamedArray.msg
   CircuitStatus.msg
+  CircuitStatusStamped.msg
+  CircuitStatusStampedArray.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -61,6 +61,10 @@ add_message_files(
   Leak.msg
   ConsumedChargeFeedback.msg
   CTP.msg
+  UavcanNodeStatus.msg
+  UavcanNodeStatusNamed.msg
+  UavcanNodeStatusNamedArray.msg
+  CircuitStatus.msg
 )
 
 ## Generate services in the 'srv' folder

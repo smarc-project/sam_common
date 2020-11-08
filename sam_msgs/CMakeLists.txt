@@ -59,6 +59,8 @@ add_message_files(
   Command.msg
   ArrayCommand.msg
   Leak.msg
+  LightCommand.msg
+  LightCommandArray.msg
   ConsumedCharge.msg
   ConsumedChargeArray.msg
   ConsumedChargeFeedback.msg

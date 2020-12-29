@@ -180,6 +180,15 @@ include_directories(
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+install(DIRECTORY urdf/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf
+  PATTERN ".svn" EXCLUDE
+)
+
+install(DIRECTORY robots/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/robots
+  PATTERN ".svn" EXCLUDE
+)
 
 #############
 ## Testing ##

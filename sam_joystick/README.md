@@ -40,8 +40,9 @@ width:4
 height:4
 topic-name:sam/ctrl/vector_deg_joystick
 x-axis: Angular Z with scale 5 to -5
-y-axis: Angular Y with scale -5 to 5
+y-axis: Angular Y with scale 5 to -5
 ```
+(the x and y axis scales can be swapped if you prefer inverted controls)
 
 7- Press the refresh arrow of this joystick.
 

@@ -1,0 +1,6 @@
+<launch>
+	<arg name="robot_name" default="sam" />
+
+	<node name="sam_joystick" pkg="sam_joystick" type="joystick_to_sam_setpoints.py" output="screen" ns="$(arg robot_name)">
+	</node>
+</launch>

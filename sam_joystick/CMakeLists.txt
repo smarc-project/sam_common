@@ -10,6 +10,8 @@ project(sam_joystick)
 find_package(catkin REQUIRED COMPONENTS
 	rospy
 	geometry_msgs
+	sam_msgs
+	smarc_msgs
 )
 
 

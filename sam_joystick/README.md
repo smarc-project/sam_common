@@ -56,3 +56,4 @@ It should look like this: https://www.dropbox.com/s/zi9e80mnb8fi0sw/20210310_101
 ## Things missing:
 - Configurable ranges in the node, in case ranges of the joystick itself (like the app allows) can not be configured.
 - Different topics?
+- Build stuff for release (CMakeLists dependencies on sam_msgs and smarc_msgs etc.)

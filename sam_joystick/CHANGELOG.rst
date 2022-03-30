@@ -2,8 +2,8 @@
 Changelog for package sam_joystick
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2022-03-30)
+------------------
 * Merge pull request `#15 <https://github.com/smarc-project/sam_common/issues/15>`_ from KKalem/noetic-devel
   Joystick controller updates
 * Cleanup and less spam

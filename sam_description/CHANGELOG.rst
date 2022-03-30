@@ -2,8 +2,8 @@
 Changelog for package sam_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2022-03-30)
+------------------
 * Merge pull request `#12 <https://github.com/smarc-project/sam_common/issues/12>`_ from nilsbore/test_release
   Release building
 * Set up release packages

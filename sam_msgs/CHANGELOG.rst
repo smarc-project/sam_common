@@ -2,8 +2,8 @@
 Changelog for package sam_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2022-03-30)
+------------------
 * Merge pull request `#11 <https://github.com/smarc-project/sam_common/issues/11>`_ from Jollerprutt/add_services
   add services
 * add services

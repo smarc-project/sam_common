@@ -1,0 +1,19 @@
+<launch>
+  <arg name="namespace" default="sam"/>
+
+  <group ns="$(arg namespace)">
+    <param name="robot_description"
+        command="$(find xacro)/xacro '$(find sam_description)/urdf/sam_auv_new.urdf.xacro' robot_namespace:=$(arg namespace)"/>
+
+    <!--<node pkg="sam_description" type="joint_state_converter.py" name="joint_state_converter"-->
+        <!--output="screen"/>-->
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
+        <param name="rate" value="300"/>
+        <rosparam param="source_list">["command_states"]</rosparam>
+    </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen">
+        <param name="robot_description" value="/$(arg namespace)/robot_description"/>
+    </node>
+  </group>
+
+</launch>

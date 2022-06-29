@@ -1,116 +1,63 @@
 <?xml version="1.0"?>
 <robot name="sam_auv" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- ECA 5E Micro mnipulator -->
-  <!-- links -->
+  <!-- Meshes. -->
+  <xacro:property name="visual_mesh_file" value="file://$(find sam_description)/mesh/SAM_HULL.dae"/>
+  <xacro:property name="prop_nozzle" value="file://$(find sam_description)/mesh/SAM_NOZZLE.dae"/>
+  <xacro:property name="front_prop" value="file://$(find sam_description)/mesh/SAM_FRONTPROP.dae"/>
+  <xacro:property name="back_prop" value="file://$(find sam_description)/mesh/SAM_BACKPROP.dae"/>
+
+  <!-- Links. -->
   <link name="$(arg robot_namespace)/base_link">
-  </link>
-  
-  <link name="$(arg robot_namespace)/thruster_yaw_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${visual_mesh_file}" scale="1 1 1"/>
+      </geometry>
+    </visual>
   </link>
 
   <link name="$(arg robot_namespace)/thruster_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${prop_nozzle}" scale="1 1 1"/>
+      </geometry>
+    </visual>
   </link>
 
-  <link name="$(arg robot_namespace)/battery_link">
+  <link name="$(arg robot_namespace)/front_prop_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${front_prop}" scale="1 1 1"/>
+      </geometry>
+    </visual>
   </link>
 
-  <link name="$(arg robot_namespace)/tcg1_link">
+  <link name="$(arg robot_namespace)/back_prop_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${back_prop}" scale="1 1 1"/>
+      </geometry>
+    </visual>
   </link>
 
-  <link name="$(arg robot_namespace)/tcg2_link">
-  </link>
-
-  <link name="$(arg robot_namespace)/multibeam_down_link">
-  </link>
-
-  <link name="$(arg robot_namespace)/pressure_link">
-  </link>
-
-  <link name="$(arg robot_namespace)/dvl_link">
-  </link>
-
-  <link name="$(arg robot_namespace)/imu_link">
-  </link>
-
-  <link name="$(arg robot_namespace)/sbg_link">
-  </link>
-  
-<!--   <link name="$(arg robot_namespace)/mag_link">
-  </link> -->
-  
-  <link name="$(arg robot_namespace)/gps_link">
-  </link>
-
-  <link name="$(arg robot_namespace)/camera_down_link">
-  </link>
-
-  <link name="$(arg robot_namespace)/camera_front_right_link">
-  </link>
-
-  <link name="$(arg robot_namespace)/camera_front_left_link">
-  </link>
-
-  <joint name="$(arg robot_namespace)/multibeam_down_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/multibeam_down_link"/>
-    <origin rpy="0.0 1.5707 0.0" xyz="1.20 0.0 -0.07"/>
-  </joint>
-
-  <joint name="$(arg robot_namespace)/pressure_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/pressure_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.3 0.0 0.07"/>
-  </joint>
-
-  <joint name="$(arg robot_namespace)/dvl_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/dvl_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="1.25 0.0 -0.07"/>
-  </joint>
-
-  <joint name="$(arg robot_namespace)/imu_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/imu_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.9 0.0 0.0"/>
-  </joint>
-
-  <joint name="$(arg robot_namespace)/sbg_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/sbg_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.472 0 0.03"/>
-  </joint>
-
-    <!-- Compass doesn't seem to have a ROS parser -->
-<!--   <joint name="$(arg robot_namespace)/mag_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/mag_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.472 0 0.03"/>
-  </joint> -->
-
-  <joint name="$(arg robot_namespace)/gps_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/gps_link"/>
-    <origin rpy="0.0 1.5707 0.0" xyz="1.2 0.0 0.08"/>
-  </joint>
-
-  <joint name="$(arg robot_namespace)/camera_down_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/camera_down_link"/>
-    <origin rpy="3.1416 0.0 -1.5707" xyz="1.15 0.0 -0.07"/>
-  </joint>
-
-  <joint name="$(arg robot_namespace)/camera_front_right_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/camera_front_right_link"/>
-    <origin rpy="1.3 3.1416 2.3416" xyz="1.32 0.05 0.005"/>
-  </joint>
-
-  <joint name="$(arg robot_namespace)/camera_front_left_joint" type="fixed">
-    <parent link="$(arg robot_namespace)/base_link"/>
-    <child link="$(arg robot_namespace)/camera_front_left_link"/>
-    <origin rpy="1.3 3.1416 0.8" xyz="1.32 -0.05 0.005"/>
-  </joint>
+  <link name="$(arg robot_namespace)/thruster_yaw_link"/>
+  <link name="$(arg robot_namespace)/battery_link"/>
+  <link name="$(arg robot_namespace)/tcg1_link"/>
+  <link name="$(arg robot_namespace)/tcg2_link"/>
+  <link name="$(arg robot_namespace)/pressure_link"/>
+  <link name="$(arg robot_namespace)/dvl_link"/>
+  <link name="$(arg robot_namespace)/sidescan_link"/>
+  <link name="$(arg robot_namespace)/imu_link"/>
+  <link name="$(arg robot_namespace)/sbg_link"/>
+  <link name="$(arg robot_namespace)/gps_link"/>
+  <link name="$(arg robot_namespace)/uw_gps_link"/>
+  <link name="$(arg robot_namespace)/camera_down_link"/>
+  <link name="$(arg robot_namespace)/camera_front_right_link"/>
+  <link name="$(arg robot_namespace)/camera_front_left_link"/>
 
   <joint name="$(arg robot_namespace)/thruster_yaw_joint" type="revolute">
     <parent link="$(arg robot_namespace)/base_link"/>
@@ -119,13 +66,88 @@
     <axis xyz="0 0 1"/>
     <limit lower="-0.2" upper="0.2" velocity="0.2" effort="1.0"/>
   </joint>
-  
+
   <joint name="$(arg robot_namespace)/thruster_pitch_joint" type="revolute">
     <parent link="$(arg robot_namespace)/thruster_yaw_link"/>
     <child link="$(arg robot_namespace)/thruster_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
     <axis xyz="0 1 0"/>
     <limit lower="-0.2" upper="0.2" velocity="0.2" effort="1.0"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/front_prop_joint" type="continuous">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/front_prop_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.056 0 0"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/back_prop_joint" type="continuous">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/back_prop_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.074 0 0"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/pressure_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/pressure_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.174 0.025 0.057"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/dvl_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/dvl_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="1.25 0.0 -0.063"/>
+  </joint>
+
+  <!--Sidescan acoustic center, i.e. intersection between both sidescan centers.-->
+  <joint name="$(arg robot_namespace)/sidescan_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/sidescan_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.634 0.0 0.0"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/imu_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/imu_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.917 0.0 -0.036"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/sbg_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/sbg_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="1.137 0.0 0.002"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/gps_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/gps_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="1.205 0.0 0.071"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/uw_gps_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/uw_gps_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.275 0.0 0.078"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/camera_down_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/camera_down_link"/>
+    <origin rpy="3.1416 0.0 -1.5707" xyz="1.1385 0.0 -0.052"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/camera_front_left_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/camera_front_left_link"/>
+    <origin rpy="1.3 3.1416 2.3416" xyz="1.313 0.048 -0.007"/>
+  </joint>
+
+  <joint name="$(arg robot_namespace)/camera_front_right_joint" type="fixed">
+    <parent link="$(arg robot_namespace)/base_link"/>
+    <child link="$(arg robot_namespace)/camera_front_right_link"/>
+    <origin rpy="1.3 3.1416 0.8" xyz="1.313 -0.048 -0.007"/>
   </joint>
 
   <joint name="$(arg robot_namespace)/lcg_joint" type="prismatic">
@@ -139,7 +161,7 @@
   <joint name="$(arg robot_namespace)/tcg_joint1" type="revolute">
     <parent link="$(arg robot_namespace)/base_link"/>
     <child link="$(arg robot_namespace)/tcg1_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.48 0.0 0.0"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.582 0.0 0.0"/>
     <axis xyz="1 0 0"/>
     <limit lower="-1.6" upper="1.6" velocity="0.2" effort="1.0"/>
   </joint>
@@ -147,9 +169,9 @@
   <joint name="$(arg robot_namespace)/tcg_joint2" type="revolute">
     <parent link="$(arg robot_namespace)/base_link"/>
     <child link="$(arg robot_namespace)/tcg2_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.46 0.0 0.0"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.552 0.0 0.0"/>
     <axis xyz="1 0 0"/>
     <limit lower="-1.6" upper="1.6" velocity="0.2" effort="1.0"/>
   </joint>
-  
+
 </robot>

@@ -62,12 +62,11 @@ class JoystickTranslator(object):
             self.published_zero_vec_once = zero
 
         # reset the stuff
-        self.rpm_msg.thruster_1_rpm = 0
-        self.rpm_msg.thruster_2_rpm = 0
-        self.vec_msg.thruster_horizontal_radians = 0
-        self.vec_msg.thruster_vertical_radians = 0
-
-
+        # Legacy code, unsure if needed for ROS-Mobile-Android
+        # self.rpm_msg.thruster_1_rpm = 0
+        # self.rpm_msg.thruster_2_rpm = 0
+        # self.vec_msg.thruster_horizontal_radians = 0
+        # self.vec_msg.thruster_vertical_radians = 0
 
 
 if __name__ == "__main__":

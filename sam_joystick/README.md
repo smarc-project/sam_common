@@ -3,7 +3,7 @@ There is a single node in here, sam_joystick, that listens to `/sam/ctrl/rpm_joy
 The rpm topic only uses the `linear.x` component and publishes that to both thrusters of SAM directly as RPM.
 The vec topic uses the `angular.z` and `angular.y` fields, converts them to radians and publishes to thrust vectoring. 
 
-This node was tested with joysticks from this app: https://github.com/ROS-Mobile/ROS-Mobile-Android.
+This node is used by [smarc_joy](https://github.com/matthew-william-lock/smarc_joy) was tested with joysticks from this app: https://github.com/ROS-Mobile/ROS-Mobile-Android.
 
 ## App setup
 1- Follow the FAQ in ROS-Mobile-Android and setup your IP addresses and such both in the vehicle and your phone.

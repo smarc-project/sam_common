@@ -1,2 +1,0 @@
-- git: {local-name: smarc_msgs, uri: 'https://github.com/smarc-project/smarc_msgs.git', version: noetic-devel}
-- git: {local-name: sam_msgs, uri: 'https://github.com/smarc-project/sam_common.git', version: noetic-devel}

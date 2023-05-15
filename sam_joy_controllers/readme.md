@@ -1,4 +1,4 @@
-# smarc_joy
+# sam_joy
 
 Your one stop shop for controlling the SAM AUV using the following controllers:
 > Please see the corresponding readme files for installation and usage instructions.

@@ -5,9 +5,4 @@ Definitions and nodes for the SAM AUV that are shared between the real vehicle a
 
 ## Included packages
 
-#### sam_joy
-
-Your one stop shop for controlling the SAM AUV using the following controllers:
-> Please see the corresponding readme files for installation and usage instructions.
-- [Playstation 5 Controller](sam_joy_controllers/sam_joy_controllers/sam_joy_ds5)
-- [Xbox One Controller](sam_joy_controllers/sam_joy_controllers/sam_joy_xbox)
+- ```sam_joy``` - Control SAM using PS5/Xbox one controllers ([installation instructions](sam_joy_controllers/sam_joy_controllers))

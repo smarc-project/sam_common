@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<launch>
+
+    <arg name="namespace" default="sam"/>
+
+    <group ns="$(arg namespace)">
+
+        <!-- DS5 ROS DRIVER -->
+        <node type="ds5_ros_node.py" pkg="sam_ds5" name="ds5_ros_node" output="screen">
+        </node>
+
+        <!-- SMARC DS5 CONTROLLER -->
+        <node type="ds5_teleop.py" pkg="sam_ds5" name="ds5_controller" output="screen">
+        </node>
+
+    </group>
+
+</launch>

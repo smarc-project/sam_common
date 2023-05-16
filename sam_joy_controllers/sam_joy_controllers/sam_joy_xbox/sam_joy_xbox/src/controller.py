@@ -49,11 +49,17 @@ class xbox_joy():
         rate = rospy.Rate(1) # 10hz
 
         self.button_pressed_flag = threading.Event()
+
         self.enable_teleop_pressed = False
+        self.enable_assisted_driving_pressed = False
+
         self.teleop_enabled = False
+        self.assisted_driving_enabled = False
 
         self.teleop_enabled_pub = rospy.Publisher('ctrl/teleop/enable', Bool, queue_size=1)
+        self.assisted_driving_enabled_pub = rospy.Publisher('ctrl/teleop/drive_assist', Bool, queue_size=1)
         self.joy_btn_pub = rospy.Publisher('ctrl/joy_buttons', JoyButtons, queue_size=1)
+
         self.joy_sub = rospy.Subscriber('joy', Joy, self.joy_callback)
 
         rospy.loginfo("[XBOX CONTROLLER] Starting Xbox controller node")
@@ -61,7 +67,7 @@ class xbox_joy():
         self.setup_controller()
 
         while not rospy.is_shutdown():
-            self.send_teleop_enabled(self.teleop_enabled)
+            self.send_states()
             rate.sleep()  
 
     def setup_controller(self):
@@ -103,21 +109,33 @@ class xbox_joy():
         """
 
         teleop_btn_pressed = msg.buttons[0] == 1
+        assited_driving_pressed = msg.buttons[3] == 1
 
         if teleop_btn_pressed and not self.enable_teleop_pressed:
             self.teleop_enabled = not self.teleop_enabled
             self.enable_teleop_pressed = True
             rospy.loginfo("[XBOX CONTROLLER] Teleop enabled: {}".format(self.teleop_enabled))
-
             if self.teleop_enabled:
-                # Only rumble if teleop is enabled
+                self.assisted_driving_enabled = False
                 self.rumble(1)
             else:
-                # Two rumbles if teleop is disabled
+                self.rumble(2)
+
+        if assited_driving_pressed and not self.enable_assisted_driving_pressed:
+            self.assisted_driving_enabled = not self.assisted_driving_enabled
+            self.enable_assisted_driving_pressed = True
+            rospy.loginfo("[XBOX CONTROLLER] Assisted driving enabled: {}".format(self.assisted_driving_enabled))
+            if self.assisted_driving_enabled:
+                self.teleop_enabled = False
+                self.rumble(1)
+            else:
                 self.rumble(2)
 
         if not teleop_btn_pressed:
             self.enable_teleop_pressed = False
+
+        if not assited_driving_pressed:
+            self.enable_assisted_driving_pressed = False
             
         joy_buttons_msg = JoyButtons()
         joy_buttons_msg.Header.stamp = rospy.Time.now()
@@ -128,6 +146,7 @@ class xbox_joy():
         joy_buttons_msg.right_y = msg.axes[4]
 
         joy_buttons_msg.teleop_enable = msg.buttons[0] == 1
+        joy_buttons_msg.assited_driving = msg.buttons[3] == 1
 
         joy_buttons_msg.d_down = msg.axes[7] == -1
         joy_buttons_msg.d_up = msg.axes[7] == 1
@@ -145,14 +164,19 @@ class xbox_joy():
     # Publish Functions
     # ================================================================================
 
-    def send_teleop_enabled(self, teleop_enabled: bool):
+    def send_states(self):
         """
-        Send a teleop enabled message to the core
+        Send the current state of the controller to the core
         """
-        
+
         teleop_enabled_msg = Bool()
-        teleop_enabled_msg.data = teleop_enabled
+        teleop_enabled_msg.data = self.teleop_enabled
+
+        assisted_driving_enabled_msg = Bool()
+        assisted_driving_enabled_msg.data = self.assisted_driving_enabled
+
         self.teleop_enabled_pub.publish(teleop_enabled_msg)
+        self.assisted_driving_enabled_pub.publish(assisted_driving_enabled_msg)
 
     # ================================================================================
     # Controller Function

@@ -1,6 +1,7 @@
 Header Header
 
 bool teleop_enable
+bool assited_driving
 
 # left joystick
 float32 left_x

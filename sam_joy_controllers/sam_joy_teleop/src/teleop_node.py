@@ -47,12 +47,15 @@ class teleop():
         Callback function for the joystick subscriber
         """
 
-        if self.teleop_enabled:
+        RPM_MAX = 1500
+        RAD_MAX = 0.1
+        RPM_LINEAR_STEP_SIZE = 1/15
 
-            RPM_MAX = 1500
-            RAD_MAX = 0.1
-            RAD_STEPS = 5
-            RAD_STEP_SIZE = RAD_MAX / RAD_STEPS
+        RAD_STEPS = 5
+        RAD_STEP_SIZE = RAD_MAX / RAD_STEPS
+        LINEAR_STEP_SIZE = 1/RAD_STEPS
+
+        if self.teleop_enabled:
 
             rpm_cmd = int(msg.left_y* RPM_MAX)
             x_cmd = msg.right_x * RAD_MAX
@@ -78,6 +81,16 @@ class teleop():
             self.rpm_joystick_pub.publish(ctrl_msg)
             self.vector_deg_joystick_pub.publish(ctrl_msg)
 
+        elif self.assisted_driving_enabled:
+
+            twist_msg = Twist()
+
+            twist_msg.linear.x = round (msg.left_y / RPM_LINEAR_STEP_SIZE) * RPM_LINEAR_STEP_SIZE
+            twist_msg.angular.z = round(msg.right_x / LINEAR_STEP_SIZE) * LINEAR_STEP_SIZE
+            twist_msg.angular.y = round(msg.right_y / LINEAR_STEP_SIZE) * LINEAR_STEP_SIZE
+
+            self.assist_drive_pub.publish(twist_msg)         
+
             # rospy.loginfo("RPM: %d, X: %f, Y: %f", rpm_cmd, x_cmd, y_cmd)
             
     def teleop_enabled_callback(self, msg: Bool):
@@ -85,6 +98,12 @@ class teleop():
         Callback function for the teleop enabled subscriber
         """
         self.teleop_enabled = msg.data
+
+    def assisted_driving_callback(self, msg: Bool):
+        """
+        Callback function for the assisted driving subscriber
+        """
+        self.assisted_driving_enabled = msg.data
 
     # ================================================================================
     # Node Init
@@ -99,10 +118,12 @@ class teleop():
         # Publishers
         self.rpm_joystick_pub = rospy.Publisher('ctrl/rpm_joystick', Twist, queue_size=1)
         self.vector_deg_joystick_pub = rospy.Publisher('ctrl/vector_deg_joystick', Twist, queue_size=1)
+        self.assist_drive_pub = rospy.Publisher('ctrl/assist_drive', Twist, queue_size=1)
 
         # Subscribers
         self.joy_btn_sub = rospy.Subscriber('ctrl/joy_buttons', JoyButtons, self.joy_btns_callback)
         self.teleop_enabled_sub = rospy.Subscriber('ctrl/teleop/enable', Bool, self.teleop_enabled_callback)
+        self.assit_driving_sub = rospy.Subscriber('ctrl/teleop/drive_assist', Bool, self.assisted_driving_callback)
 
         # States
         self.teleop_enabled = False

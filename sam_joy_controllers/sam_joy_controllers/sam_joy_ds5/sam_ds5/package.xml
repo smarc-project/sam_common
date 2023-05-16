@@ -22,7 +22,7 @@
   <exec_depend>std_msgs</exec_depend>
 
   <build_depend>sam_msgs</build_depend>
-  <build_depend>smarc_msgs</build_depend>
+  <build_export_depend>smarc_msgs</build_export_depend>
   <build_depend>ds5_msgs</build_depend>
 
 

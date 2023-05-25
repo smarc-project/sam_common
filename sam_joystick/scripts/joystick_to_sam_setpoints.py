@@ -10,17 +10,31 @@ from geometry_msgs.msg import Twist
 
 class JoystickTranslator(object):
     def __init__(self):
-        self.rpm_sub = rospy.Subscriber("ctrl/rpm_joystick", Twist, self.rpm_cb, queue_size=1)
-        self.vector_sub = rospy.Subscriber("ctrl/vector_deg_joystick", Twist, self.vector_cb, queue_size=1)
 
-        self.thruster_pub = rospy.Publisher("core/rpm_cmd", ThrusterRPMs, queue_size=1)
-        self.vector_pub = rospy.Publisher("core/thrust_vector_cmd", ThrusterAngles, queue_size=1)
+        rpm_cmd_top = rospy.get_param("~rpm_cmd_top", "/rpm_cmd")
+        thrust_cmd_top = rospy.get_param("~thrust_vector_cmd_top", "/thrust_vector_cmd")
+        rpm_joystick_top = rospy.get_param("~rpm_joystick_top", "/rpm_joystick")
+        vector_deg_joystick_top = rospy.get_param("~vector_deg_joystick_top", "/vector_deg_joystick")
+        freq = rospy.get_param("~node_freq", 1)
+
+        self.rpm_sub = rospy.Subscriber(rpm_joystick_top, Twist, self.rpm_cb, queue_size=1)
+        self.vector_sub = rospy.Subscriber(vector_deg_joystick_top, Twist, self.vector_cb, queue_size=1)
+
+        self.thruster_pub = rospy.Publisher(rpm_cmd_top, ThrusterRPMs, queue_size=1)
+        self.vector_pub = rospy.Publisher(thrust_cmd_top, ThrusterAngles, queue_size=1)
 
         self.rpm_msg = ThrusterRPMs()
         self.vec_msg = ThrusterAngles()
 
         self.published_zero_rpm_once = False
         self.published_zero_vec_once = False
+
+        rate = rospy.Rate(freq)
+        while not rospy.is_shutdown():
+            self.publish()
+            rate.sleep()
+
+    rospy.loginfo("Joystick listener stopped")
 
     def rpm_cb(self, twist):
         # linear.x is forward, straight to RPMs
@@ -37,8 +51,10 @@ class JoystickTranslator(object):
 
     def publish(self):
         if self.rpm_msg.thruster_1_rpm != 0 or not self.published_zero_rpm_once:
+            
             self.thruster_pub.publish(self.rpm_msg)
             zero = self.rpm_msg.thruster_1_rpm == 0
+            
             if zero:
                 rospy.loginfo(">>>>> Published 0 RPM")
             else:
@@ -54,6 +70,7 @@ class JoystickTranslator(object):
 
             zero = self.vec_msg.thruster_horizontal_radians == 0 and\
                    self.vec_msg.thruster_vertical_radians == 0
+            
             if zero:
                 rospy.loginfo(">>>>> Published 0 thrust vector")
             else:
@@ -73,13 +90,6 @@ if __name__ == "__main__":
     rospy.init_node("joystick_to_sam_setpoints")
     jt = JoystickTranslator()
     rospy.loginfo("Digital joystick translator for SAM is running...")
-
-    rate = rospy.Rate(12)
-    while not rospy.is_shutdown():
-        jt.publish()
-        rate.sleep()
-
-    rospy.loginfo("Joystick listener stopped")
 
 
 

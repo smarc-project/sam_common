@@ -78,7 +78,7 @@ class teleop():
 
             self.rpm_msg.thruster_1_rpm = int(rpm_cmd)
             self.rpm_msg.thruster_2_rpm = int(rpm_cmd)
-            self.vec_msg.thruster_horizontal_radians = math.radians(-x_cmd)
+            self.vec_msg.thruster_horizontal_radians = - x_cmd
             self.vec_msg.thruster_vertical_radians = elev_cmd
 
             self.send_cmds()

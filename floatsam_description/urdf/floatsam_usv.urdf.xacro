@@ -1,0 +1,85 @@
+<?xml version="2.0"?>
+<robot name="floatsam" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="body" value="file://$(find floatsam_description)/mesh/floatsam_usv.dae"/>
+  <xacro:property name="PI" value="3.141592" />
+
+  <xacro:macro name="floatsam_usv" params="namespace debug">
+
+  <!-- Links. -->
+  <link name="$(arg namespace)/base_link">
+    <visual>
+      <origin xyz="-0.3 0 -0.1" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${body}" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="$(arg namespace)/thruster_port_link"/>
+  <link name="$(arg namespace)/thruster_starboard_link"/>
+  <link name="$(arg namespace)/imu_link"/>
+  <link name="$(arg namespace)/sbg_link"/>
+  <link name="$(arg namespace)/gps_0_link"/>
+  <link name="$(arg namespace)/gps_1_link"/>
+  <link name="$(arg namespace)/gps_2_link"/>
+  <link name="$(arg namespace)/gps_3_link"/>
+  <link name="$(arg namespace)/uw_gps_link"/>
+
+  <joint name="$(arg namespace)/thruster_port_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/thruster_port_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.09 0.25 -0.15"/>
+  </joint>
+
+  <joint name="$(arg namespace)/thruster_starboard_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/thruster_starboard_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.09 -0.25 -0.15"/>
+  </joint>
+
+  <joint name="$(arg namespace)/imu_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/imu_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.1 0.0 0.0"/>
+  </joint>
+   
+  <joint name="$(arg namespace)/sbg_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/sbg_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.1 0.1 0.0"/>
+  </joint>
+
+  <joint name="$(arg namespace)/gps_0_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/gps_0_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.5 0.25 0.11"/>
+  </joint>
+
+  <joint name="$(arg namespace)/gps_1_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/gps_1_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.5 -0.25 0.11"/>
+  </joint>
+
+  <joint name="$(arg namespace)/gps_2_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/gps_2_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.05 -0.25 0.11"/>
+  </joint>
+
+  <joint name="$(arg namespace)/gps_3_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/gps_3_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.05 0.25 0.11"/>
+  </joint>
+
+  <joint name="$(arg namespace)/uw_gps_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/uw_gps_link"/>
+    <origin rpy="${PI} 0.0 ${PI / 2}" xyz="0.4 0. -0.15"/>
+  </joint>
+
+  </xacro:macro>
+
+</robot>

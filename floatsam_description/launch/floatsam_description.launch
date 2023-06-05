@@ -1,0 +1,41 @@
+<launch>
+  <arg name="namespace" default="floatsam"/>
+  <arg name="debug" default="0"/>
+
+  <group ns="$(arg namespace)">
+    <param name="robot_description"
+        command="$(find xacro)/xacro '$(find floatsam_description)/robots/floatsam_usv_default.urdf.xacro' debug:=$(arg debug) namespace:=$(arg namespace)"/>
+
+    <!--<node pkg="sam_description" type="joint_state_converter.py" name="joint_state_converter"-->
+        <!--output="screen"/>-->
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
+        <!-- <param name="rate" value="100"/> -->
+        <param name="use_gui" value="false"/>
+        <rosparam param="source_list">["command_states"]</rosparam>
+    </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen">
+        <param name="robot_description" value="/$(arg namespace)/robot_description"/>
+    </node>
+  </group>
+
+
+    <arg name="namespace2" default="sam"/>
+    <arg name="mode" default="default"/>
+
+    <group ns="$(arg namespace2)">
+
+          <param name="robot_description"
+           command="$(find xacro)/xacro '$(find sam_description)/robots/sam_auv_$(arg mode).urdf.xacro' debug:=$(arg debug) namespace:=$(arg namespace2)" />
+
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen">
+          <param name="robot_description" value="/$(arg namespace2)/robot_description" />
+        </node>
+
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="screen">
+          <param name="use_gui" value="false"/>
+          <rosparam param="source_list">["/sam/command_states"]</rosparam>
+        </node>
+
+    </group>
+
+</launch>

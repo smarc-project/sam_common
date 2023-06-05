@@ -3,7 +3,6 @@
 
   <xacro:property name="body" value="file://$(find floatsam_description)/mesh/floatsam_usv.dae"/>
   <xacro:property name="PI" value="3.141592" />
-
   <xacro:macro name="floatsam_usv" params="namespace debug">
 
   <!-- Links. -->

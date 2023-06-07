@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import rospy
 from rospy import ROSException
@@ -48,7 +48,7 @@ class GPSFixServer(object):
             if not resp.success:
                 self._feedback.status = "Service call returned false, failed to %s dvl" % value_string
                 rospy.loginfo("Service call returned false, failed to %s dvl", value_string)
-        except (rospy.ServiceException, ROSException), e:
+        except (rospy.ServiceException, ROSException) as e:
             self._feedback.status = "Service call failed, failed to %s dvl" % value_string
             rospy.loginfo("Service call failed: %s, failed to %s dvl", e, value_string)
         #finally:

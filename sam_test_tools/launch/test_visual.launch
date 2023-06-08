@@ -15,7 +15,7 @@
   <group ns="$(arg namespace)">
 
     <param name="robot_description"
-           command="$(find xacro)/xacro.py '$(find sam_description)/robots/sam_auv_$(arg mode).urdf.xacro' debug:=$(arg debug) namespace:=$(arg namespace)" />
+           command="$(find xacro)/xacro '$(find sam_description)/robots/sam_auv_$(arg mode).urdf.xacro' debug:=$(arg debug) namespace:=$(arg namespace)" />
   </group>
 
   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find sam_test_tools)/rviz/tank_test.rviz" output="screen" />

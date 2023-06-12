@@ -24,6 +24,7 @@
   <link name="$(arg namespace)/rtk_stb_link"/>
   <link name="$(arg namespace)/rtk_prt_link"/>
   <link name="$(arg namespace)/uw_gps_link"/>
+  <link name="$(arg namespace)/dvl_link"/>
 
   <joint name="$(arg namespace)/thruster_port_joint" type="fixed">
     <parent link="$(arg namespace)/base_link"/>
@@ -77,6 +78,12 @@
     <parent link="$(arg namespace)/base_link"/>
     <child link="$(arg namespace)/uw_gps_link"/>
     <origin rpy="${PI} 0.0 ${PI / 2}" xyz="0.4 0. -0.15"/>
+  </joint>
+
+  <joint name="$(arg namespace)/dvl_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/dvl_link"/>
+    <origin rpy="0. 0.0 0." xyz="0.42 -0.25 -0.15"/>
   </joint>
 
   </xacro:macro>

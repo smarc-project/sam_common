@@ -81,7 +81,7 @@ class teleop():
             self.vec_msg.thruster_horizontal_radians = - x_cmd
             self.vec_msg.thruster_vertical_radians = elev_cmd
 
-            self.send_cmds()
+
 
 
     def send_cmds(self):
@@ -194,8 +194,12 @@ class teleop():
         self.depth_sub = rospy.Subscriber(depth_top, Float64, self.depth_cb)
         self.elevator_pid_sub = rospy.Subscriber(elevator_pid_top, Float64, self.elev_pid_cb)
 
+        rate = rospy.Rate(12)
+        while not rospy.is_shutdown():
+            self.send_cmds()
+            rate.sleep()
 
-        rospy.spin()
+        # rospy.spin()
   
 
 if __name__ == '__main__':

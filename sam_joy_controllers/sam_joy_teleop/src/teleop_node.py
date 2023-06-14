@@ -74,12 +74,12 @@ class teleop():
             
             # If assisted depth-keeping, ctrl_msg.angular.y is overriden by PID controller
             y_cmd = max(min(y_cmd, 0.1), -0.1)  # Elevator boundaries
-            elev_cmd = self.elev_effort if self.assisted_driving_enabled else y_cmd
+            # elev_cmd = self.elev_effort if self.assisted_driving_enabled else y_cmd
 
             self.rpm_msg.thruster_1_rpm = int(rpm_cmd)
             self.rpm_msg.thruster_2_rpm = int(rpm_cmd)
             self.vec_msg.thruster_horizontal_radians = - x_cmd
-            self.vec_msg.thruster_vertical_radians = elev_cmd
+            self.vec_msg.thruster_vertical_radians = y_cmd
 
 
 
@@ -100,6 +100,10 @@ class teleop():
         if self.vec_msg.thruster_horizontal_radians != 0 or \
            self.vec_msg.thruster_vertical_radians != 0 or \
            not self.published_zero_vec_once:
+
+            if self.assisted_driving_enabled:
+                elev_cmd = self.elev_effort
+                self.vec_msg.thruster_vertical_radians = elev_cmd
 
             self.vector_pub.publish(self.vec_msg)
 

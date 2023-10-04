@@ -1,0 +1,14 @@
+# - Config file for the sam_msgs package
+# It defines the following variables
+#  sam_msgs_INCLUDE_DIRS - include directories for FooBar
+#  sam_msgs_LIBRARIES    - libraries to link against
+#  sam_msgs_EXECUTABLE   - the bar executable
+
+set(sam_msgs_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${sam_msgs_DIR}/export_sam_msgs.cmake")
+
+# These are IMPORTED targets created by sam_msgsTargets.cmake
+
+

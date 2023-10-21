@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<robot name="cm_station" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+  <xacro:arg name="debug" default="0"/>
+  <xacro:arg name="namespace" default="cm_station"/>
+  <xacro:include filename="$(find cm_station_description)/urdf/cm_station.urdf.xacro"/>
+  <xacro:cm_station namespace="$(arg namespace)" debug="$(arg debug)"/>
+</robot>

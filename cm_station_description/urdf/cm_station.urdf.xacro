@@ -1,0 +1,34 @@
+<?xml version="2.0"?>
+<robot name="cm_station" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="PI" value="3.141592" />
+  <xacro:macro name="cm_station" params="namespace debug">
+
+  <!-- Links. -->
+  <link name="$(arg namespace)/base_link"/>
+  <link name="$(arg namespace)/uw_gps_link"/>
+  <link name="$(arg namespace)/sbg_link"/>
+  <link name="$(arg namespace)/gps_link"/>
+  <!-- <link name="$(arg namespace)/uw_comm_link"/> -->
+  
+  <joint name="$(arg namespace)/sbg_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/sbg_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0. 0. 0.0"/>
+  </joint>
+
+  <joint name="$(arg namespace)/gps_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/gps_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0. 0. 0."/>
+  </joint>
+
+  <joint name="$(arg namespace)/uw_gps_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/uw_gps_link"/>
+    <origin rpy="${PI} 0.0 -${PI / 2}" xyz="0.4 0. -0.15"/>
+  </joint>
+
+  </xacro:macro>
+
+</robot>

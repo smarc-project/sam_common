@@ -1,2 +1,2 @@
 bool value
-int32 leak_counter
+int8 sensor_id

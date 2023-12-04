@@ -8,17 +8,26 @@ endif()
 # find_package(<dependency> REQUIRED)
 find_package(ament_cmake REQUIRED)
 
-
-
-install(DIRECTORY
-  urdf/
-  DESTINATION share/${PROJECT_NAME}/urdf/
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/launch
 )
 
-install(DIRECTORY
-  robots/
-  DESTINATION share/${PROJECT_NAME}/robots/
+install(
+  DIRECTORY mesh
+  DESTINATION share/${PROJECT_NAME}/mesh
 )
+
+install(
+  DIRECTORY robots
+  DESTINATION share/${PROJECT_NAME}/robots
+)
+
+install(
+  DIRECTORY urdf
+  DESTINATION share/${PROJECT_NAME}/urdf
+)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

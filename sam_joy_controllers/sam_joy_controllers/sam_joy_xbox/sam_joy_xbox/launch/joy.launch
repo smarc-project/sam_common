@@ -4,22 +4,36 @@
     <arg name="namespace" default="sam"/>
 
     <group ns="$(arg namespace)">
+    
+        <group ns="ctrl">
+        
+            <!-- JOY NODE-->
+            <node type="joy_node" pkg="joy" name="joy_node" output="screen">
+            </node>
 
-        <!-- JOY NODE-->
-        <node type="joy_node" pkg="joy" name="joy_node" output="screen">
-        </node>
-
-        <!-- SAM Joystick Controls-->
-        <node type="joystick_to_sam_setpoints.py" pkg="sam_joystick" name="sam_joystick" output="screen">
-        </node>
-
-        <!-- SAM XBOX CONTROLLER NODE -->
-        <node type="controller.py" pkg="sam_joy_xbox" name="xbox_node" output="screen">
-        </node>
-
-        <!-- SMARC CONTROLLER NODE -->
-        <node type="teleop_node.py" pkg="sam_joy_teleop" name="teleop_node" output="screen">
-        </node>
+            <!-- SAM XBOX CONTROLLER NODE -->
+            <node type="controller.py" pkg="sam_joy_xbox" name="xbox_node" output="screen">
+                <param name="teleop_enable" value="teleop/enable"/>
+                <param name="assist_enable" value="teleop/drive_assist_enable"/>
+                <param name="joy_buttons" value="joy_buttons"/>
+                <param name="joy_top" value="joy"/>
+            </node>
+            
+            <!-- SMARC CONTROLLER NODE -->
+            <node type="teleop_node.py" pkg="sam_joy_teleop" name="teleop_node" output="screen">
+                <param name="joy_buttons" value="joy_buttons"/>
+                <param name="rpm_joystick_top" value="rpm_joystick"/>
+                <param name="vector_deg_joystick_top" value="vector_deg_joystick"/>
+                <param name="teleop_enable" value="teleop/enable"/>
+                <param name="assist_enable" value="teleop/drive_assist_enable"/>
+                <param name="depth_top" value="/$(arg namespace)/dr/depth"/>
+                <param name="elevator_pid_ctrl" value="elevator_pid/ctrl_effort"/>
+                <param name="elev_sp_top" value="elevator_pid/setpoint"/>
+                <param name="rpm_cmd_top" value="/$(arg namespace)/core/rpm_cmd"/>
+                <param name="thrust_vector_cmd_top" value="/$(arg namespace)/core/thrust_vector_cmd"/>
+            </node>
+            
+        </group>
 
     </group>
 

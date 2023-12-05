@@ -9,23 +9,23 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY launch
-  DESTINATION share/${PROJECT_NAME}/launch
+  DIRECTORY launch/
+  DESTINATION share/${PROJECT_NAME}/launch/
 )
 
 install(
-  DIRECTORY mesh
-  DESTINATION share/${PROJECT_NAME}/mesh
+  DIRECTORY mesh/
+  DESTINATION share/${PROJECT_NAME}/mesh/
 )
 
 install(
-  DIRECTORY robots
-  DESTINATION share/${PROJECT_NAME}/robots
+  DIRECTORY robots/
+  DESTINATION share/${PROJECT_NAME}/robots/
 )
 
 install(
-  DIRECTORY urdf
-  DESTINATION share/${PROJECT_NAME}/urdf
+  DIRECTORY urdf/
+  DESTINATION share/${PROJECT_NAME}/urdf/
 )
 
 

@@ -8,9 +8,9 @@
   <xacro:property name="back_prop" value="file://$(find sam_description)/mesh/SAM_BACKPROP.dae"/>
 
 
-  <xacro:macro name="sam_auv" params="namespace debug">
+  <xacro:macro name="sam_auv" params="debug">
   <!-- Links. -->
-  <link name="$(arg namespace)/base_link">
+  <link name="base_link">
     <visual>
       <origin xyz="-0.677 0 0" rpy="0 0 0"/>
       <geometry>
@@ -19,7 +19,7 @@
     </visual>
   </link>
 
-  <link name="$(arg namespace)/thruster_link">
+  <link name="thruster_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -28,7 +28,7 @@
     </visual>
   </link>
 
-  <link name="$(arg namespace)/front_prop_link">
+  <link name="front_prop_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -37,7 +37,7 @@
     </visual>
   </link>
 
-  <link name="$(arg namespace)/back_prop_link">
+  <link name="back_prop_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -46,140 +46,140 @@
     </visual>
   </link>
 
-  <link name="$(arg namespace)/thruster_yaw_link"/>
-  <link name="$(arg namespace)/battery_link"/>
-  <link name="$(arg namespace)/tcg1_link"/>
-  <link name="$(arg namespace)/tcg2_link"/>
-  <link name="$(arg namespace)/pressure_link"/>
-  <link name="$(arg namespace)/dvl_link"/>
-  <link name="$(arg namespace)/sidescan_link"/>
-  <link name="$(arg namespace)/imu_link"/>
-  <link name="$(arg namespace)/sbg_link"/>
-  <link name="$(arg namespace)/gps_link"/>
-  <link name="$(arg namespace)/uw_gps_link"/>
-  <link name="$(arg namespace)/camera_down_link"/>
-  <link name="$(arg namespace)/camera_front_right_link"/>
-  <link name="$(arg namespace)/camera_front_left_link"/>
-  <link name="$(arg namespace)/camera_front_link"/>
+  <link name="thruster_yaw_link"/>
+  <link name="battery_link"/>
+  <link name="tcg1_link"/>
+  <link name="tcg2_link"/>
+  <link name="pressure_link"/>
+  <link name="dvl_link"/>
+  <link name="sidescan_link"/>
+  <link name="imu_link"/>
+  <link name="sbg_link"/>
+  <link name="gps_link"/>
+  <link name="uw_gps_link"/>
+  <link name="camera_down_link"/>
+  <link name="camera_front_right_link"/>
+  <link name="camera_front_left_link"/>
+  <link name="camera_front_link"/>
 
-  <joint name="$(arg namespace)/thruster_yaw_joint" type="revolute">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/thruster_yaw_link"/>
+  <joint name="thruster_yaw_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="thruster_yaw_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="-0.677 0.0 0.0"/>
     <axis xyz="0 0 1"/>
     <limit lower="-0.2" upper="0.2" velocity="0.2" effort="1.0"/>
   </joint>
 
-  <joint name="$(arg namespace)/thruster_pitch_joint" type="revolute">
-    <parent link="$(arg namespace)/thruster_yaw_link"/>
-    <child link="$(arg namespace)/thruster_link"/>
+  <joint name="thruster_pitch_joint" type="revolute">
+    <parent link="thruster_yaw_link"/>
+    <child link="thruster_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
     <axis xyz="0 1 0"/>
     <limit lower="-0.2" upper="0.2" velocity="0.2" effort="1.0"/>
   </joint>
 
-  <joint name="$(arg namespace)/front_prop_joint" type="continuous">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/front_prop_link"/>
+  <joint name="front_prop_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="front_prop_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="-0.733 0 0"/>
     <axis xyz="1 0 0"/>
   </joint>
 
-  <joint name="$(arg namespace)/back_prop_joint" type="continuous">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/back_prop_link"/>
+  <joint name="back_prop_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="back_prop_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="-0.751 0 0"/>
     <axis xyz="1 0 0"/>
   </joint>
 
-  <joint name="$(arg namespace)/pressure_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/pressure_link"/>
+  <joint name="pressure_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="pressure_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="-0.503 0.025 0.057"/>
   </joint>
 
-  <joint name="$(arg namespace)/dvl_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/dvl_link"/>
+  <joint name="dvl_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="dvl_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.573 0.0 -0.063"/>
   </joint>
 
   <!--Sidescan acoustic center, i.e. intersection between both sidescan centers.-->
-  <joint name="$(arg namespace)/sidescan_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/sidescan_link"/>
+  <joint name="sidescan_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="sidescan_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="-0.043 0.0 0.0"/>
   </joint>
 
-  <joint name="$(arg namespace)/imu_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/imu_link"/>
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.24 0.0 -0.036"/>
   </joint>
 
-  <joint name="$(arg namespace)/sbg_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/sbg_link"/>
+  <joint name="sbg_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="sbg_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.46 0.0 0.002"/>
   </joint>
 
-  <joint name="$(arg namespace)/gps_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/gps_link"/>
+  <joint name="gps_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="gps_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.528 0.0 0.071"/>
   </joint>
 
-  <joint name="$(arg namespace)/uw_gps_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/uw_gps_link"/>
+  <joint name="uw_gps_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="uw_gps_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="-0.402 0.0 0.078"/>
   </joint>
 
   <!-- Waterlink Nosecone Camera Positions --> 
-  <joint name="$(arg namespace)/camera_front_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/camera_front_link"/>
+  <joint name="camera_front_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_front_link"/>
     <origin rpy="-1.5707 0.0 -1.5707" xyz="0.647 0.0 0.0"/>
   </joint>
 	  
-  <joint name="$(arg namespace)/camera_down_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/camera_down_link"/>
+  <joint name="camera_down_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_down_link"/>
     <origin rpy="3.1416 0.0 -1.5707" xyz="0.5905 0.0 -0.058"/>
   </joint>
 
-  <joint name="$(arg namespace)/camera_front_left_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/camera_front_left_link"/>
+  <joint name="camera_front_left_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_front_left_link"/>
     <!--origin rpy="1.3 3.1416 2.3416" xyz="0.636 0.050 -0.007"/-->
     <origin rpy="1.3 3.1416 2.3416" xyz="0.636 0.050 -0.007"/>
   </joint>
 
-  <joint name="$(arg namespace)/camera_front_right_joint" type="fixed">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/camera_front_right_link"/>
+  <joint name="camera_front_right_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_front_right_link"/>
     <origin rpy="1.3 3.1416 0.8" xyz="0.636 -0.050 -0.007"/>
   </joint>
 
-  <joint name="$(arg namespace)/lcg_joint" type="prismatic">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/battery_link"/>
+  <joint name="lcg_joint" type="prismatic">
+    <parent link="base_link"/>
+    <child link="battery_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.083 0.0 0.0"/>
     <axis xyz="1 0 0"/>
     <limit lower="-0.01" upper="0.01" velocity="0.2" effort="1.0"/>
   </joint>
 
-  <joint name="$(arg namespace)/tcg_joint1" type="revolute">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/tcg1_link"/>
+  <joint name="tcg_joint1" type="revolute">
+    <parent link="base_link"/>
+    <child link="tcg1_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="-0.095 0.0 0.0"/>
     <axis xyz="1 0 0"/>
     <limit lower="-1.6" upper="1.6" velocity="0.2" effort="1.0"/>
   </joint>
 
-  <joint name="$(arg namespace)/tcg_joint2" type="revolute">
-    <parent link="$(arg namespace)/base_link"/>
-    <child link="$(arg namespace)/tcg2_link"/>
+  <joint name="tcg_joint2" type="revolute">
+    <parent link="base_link"/>
+    <child link="tcg2_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="-0.125 0.0 0.0"/>
     <axis xyz="1 0 0"/>
     <limit lower="-1.6" upper="1.6" velocity="0.2" effort="1.0"/>

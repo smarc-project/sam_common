@@ -2,13 +2,26 @@
 <robot name="cm_station" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:property name="PI" value="3.141592" />
+  <xacro:property name="body" value="file://$(find cm_station_description)/mesh/nachosthickness.dae"/>
+  
   <xacro:macro name="cm_station" params="namespace debug">
 
   <!-- Links. -->
-  <link name="$(arg namespace)/base_link"/>
+  <link name="$(arg namespace)/base_link">
+    <!-- <visual>
+      <origin xyz="4.7 0 -2.5" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${body}" scale="5 5 5"/>
+      </geometry>
+    </visual> -->
+  </link>
+
+  <!-- <link name="$(arg namespace)/base_link"/> -->
   <link name="$(arg namespace)/uw_gps_link"/>
   <link name="$(arg namespace)/sbg_link"/>
   <link name="$(arg namespace)/gps_link"/>
+  <link name="$(arg namespace)/uw_cam_link"/>
+
   <!-- <link name="$(arg namespace)/uw_comm_link"/> -->
   
   <joint name="$(arg namespace)/sbg_joint" type="fixed">
@@ -28,6 +41,14 @@
     <child link="$(arg namespace)/uw_gps_link"/>
     <origin rpy="${PI} 0.0 0.0" xyz="0. 0. -1."/>
     <!-- <origin rpy="${PI} 0.0 -${PI / 2}" xyz="0.4 0. -0.15"/> -->
+  </joint>
+
+  <joint name="$(arg namespace)/uw_camera_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/uw_cam_link"/>
+    <origin rpy="0.0 2.76893 0.0" xyz="0.4 0. 0"/>
+    <!-- <origin rpy="0.0 0.698132 0.0" xyz="0.3 0. 0"/> -->
+    <!-- <origin rpy="${-pi/2} 0.0 ${-pi/2}" xyz="0.3 0. 0"/> -->
   </joint>
 
   </xacro:macro>

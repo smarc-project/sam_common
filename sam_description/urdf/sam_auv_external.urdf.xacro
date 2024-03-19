@@ -1,0 +1,104 @@
+<?xml version="2.0"?>
+<robot name="sam" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Meshes. -->
+  <xacro:property name="visual_mesh_file" value="file://$(find sam_description)/mesh/SAM_HULL.dae"/>
+  <xacro:property name="prop_nozzle" value="file://$(find sam_description)/mesh/SAM_NOZZLE.dae"/>
+  <xacro:property name="front_prop" value="file://$(find sam_description)/mesh/SAM_FRONTPROP.dae"/>
+  <xacro:property name="back_prop" value="file://$(find sam_description)/mesh/SAM_BACKPROP.dae"/>
+
+
+  <xacro:macro name="sam_auv" params="namespace debug">
+  <!-- Links. -->
+  <link name="$(arg namespace)/base_link">
+    <visual>
+      <origin xyz="-0.677 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${visual_mesh_file}" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="$(arg namespace)/thruster_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${prop_nozzle}" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="$(arg namespace)/front_prop_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${front_prop}" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="$(arg namespace)/back_prop_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${back_prop}" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="$(arg namespace)/thruster_yaw_link"/>
+  <link name="$(arg namespace)/qr_link_0"/>
+  <link name="$(arg namespace)/qr_link_optical_0"/>
+  <!-- <link name="$(arg namespace)/qr_link_1"/> -->
+
+  <joint name="$(arg namespace)/qr_0_joint" type="fixed">
+    <parent link="$(arg namespace)/qr_link_optical_0"/>
+    <child link="$(arg namespace)/qr_link_0"/>
+    <origin rpy="0. 0. ${-pi/2}" xyz="0. 0. 0."/>
+  </joint>
+
+  <joint name="$(arg namespace)/base_joint" type="fixed">
+    <parent link="$(arg namespace)/qr_link_0"/>
+    <child link="$(arg namespace)/base_link"/>
+    <origin rpy="0. 0. 0.0" xyz="-0.3 0. -0.057"/>
+  </joint>
+
+  <joint name="$(arg namespace)/thruster_yaw_joint" type="revolute">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/thruster_yaw_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.677 0.0 0.0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-0.2" upper="0.2" velocity="0.2" effort="1.0"/>
+  </joint>
+
+  <joint name="$(arg namespace)/thruster_pitch_joint" type="revolute">
+    <parent link="$(arg namespace)/thruster_yaw_link"/>
+    <child link="$(arg namespace)/thruster_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.2" upper="0.2" velocity="0.2" effort="1.0"/>
+  </joint>
+
+  <joint name="$(arg namespace)/front_prop_joint" type="continuous">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/front_prop_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.733 0 0"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+  <joint name="$(arg namespace)/back_prop_joint" type="continuous">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/back_prop_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.751 0 0"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+  <!-- <joint name="$(arg namespace)/qr_1_joint" type="fixed">
+    <parent link="$(arg namespace)/base_link"/>
+    <child link="$(arg namespace)/qr_link_1"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.3 0. 0.057"/>
+  </joint> -->
+
+  </xacro:macro>
+
+</robot>

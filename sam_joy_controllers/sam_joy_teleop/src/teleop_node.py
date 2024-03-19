@@ -32,6 +32,7 @@ import rospy
 from std_msgs.msg import Bool, Float64
 from geometry_msgs.msg import Twist
 from sam_msgs.msg import ThrusterAngles, ThrusterRPMs
+from smarc_msgs.msg import ThrusterRPM
 
 from sam_joy_msgs.msg import JoyButtons
 
@@ -48,7 +49,7 @@ class teleop():
         Callback function for the joystick subscriber
         """
 
-        RPM_MAX = 1500
+        RPM_MAX = 230
         RAD_MAX = 0.1
         RPM_LINEAR_STEP_SIZE = 1/15
 
@@ -86,6 +87,11 @@ class teleop():
 
     def send_cmds(self):
         if self.rpm_msg.thruster_1_rpm != 0 or not self.published_zero_rpm_once:
+            rpm_msg = ThrusterRPM()
+            rpm_msg.rpm = self.rpm_msg.thruster_1_rpm
+            self.thruster1_pub.publish(rpm_msg)
+            rpm_msg.rpm = self.rpm_msg.thruster_2_rpm
+            self.thruster2_pub.publish(rpm_msg)
             
             self.thruster_pub.publish(self.rpm_msg)
             zero = self.rpm_msg.thruster_1_rpm == 0
@@ -189,6 +195,8 @@ class teleop():
         self.vector_deg_joystick_pub = rospy.Publisher(vector_deg_joystick_top, Twist, queue_size=1)
         self.elev_sp_pub = rospy.Publisher(elev_sp_top, Float64, queue_size=1)
         self.thruster_pub = rospy.Publisher(rpm_cmd_top, ThrusterRPMs, queue_size=1)
+        self.thruster1_pub = rospy.Publisher("/sam/core/thruster1_cmd", ThrusterRPM, queue_size=1)
+        self.thruster2_pub = rospy.Publisher("/sam/core/thruster2_cmd", ThrusterRPM, queue_size=1)
         self.vector_pub = rospy.Publisher(thrust_cmd_top, ThrusterAngles, queue_size=1)
 
         # Subscribers
